@@ -39,19 +39,42 @@ function handleClick(e) {
     setTimeout(computerMove, 500);
   }
 }
+function findBestMove(player) {
+  for (const [a, b, c] of winningCombos) {
+    const line = [board[a], board[b], board[c]];
+    // Wenn 2 Felder vom gleichen Spieler belegt sind und 1 frei ist → guter Zug
+    if (line.filter(v => v === player).length === 2 && line.includes(null)) {
+      return [a, b, c][line.indexOf(null)];
+    }
+  }
+  return null;
+}
 
 function computerMove() {
   if (gameOver) return;
 
-  const emptyIndices = board
-    .map((val, idx) => val === null ? idx : null)
-    .filter(idx => idx !== null);
+  let move = null;
 
-  if (emptyIndices.length === 0) return;
+  // 1. Computer versucht zu gewinnen
+  move = findBestMove('O');
 
-  const randomIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-  board[randomIndex] = 'O';
-  cells[randomIndex].textContent = 'O';
+  // 2. Wenn das nicht geht: Spieler blockieren
+  if (move === null) {
+    move = findBestMove('X');
+  }
+
+  // 3. Wenn auch das nicht geht: zufälliger Zug
+  if (move === null) {
+    const emptyIndices = board
+      .map((val, idx) => val === null ? idx : null)
+      .filter(idx => idx !== null);
+
+    move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+  }
+
+  // Zug ausführen
+  board[move] = 'O';
+  cells[move].textContent = 'O';
 
   const result = checkWinner();
   if (result) {
@@ -61,6 +84,7 @@ function computerMove() {
     statusDiv.textContent = 'Du bist dran (X).';
   }
 }
+
 
 function endGame(result) {
   gameOver = true;
