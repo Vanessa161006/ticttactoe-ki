@@ -23,7 +23,7 @@ function checkWinner() {
 }
 
 function handleClick(e) {
-  const index = e.target.dataset.index;
+  const index = Number(e.target.dataset.index);
 
   if (gameOver || board[index] !== null || currentPlayer !== 'X') return;
 
